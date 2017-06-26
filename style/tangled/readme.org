@@ -1,0 +1,131 @@
+* Process
+
+Run ~gen.sh~ to get the scala code from the md files in the parent directory.
+
+This will include examples of "wrong" code, so delete them manually
+(look for "wrong!" and "will not compile")
+
+You also need to replace ~...~ with ~???~, and put all samples inside an
+enclosing object. You'll need to also put ~{}~ after ~package~ declaration
+examples. There are some Java and ML examples to remove too.
+
+To test a file, run ~./testone.sh <filename>~, which diffs scalafmt's idea of the right version with the current version. You can use ~scalafmt --test~ as well but it won't show you the problem. Enclose the problem examples with a ~// format: off~ / ~// format: on~ pair and note them.
+
+Run ~test.sh~ to test ~scalafmt --test~ against all the ~.scala~ files.
+
+* Progress
+
+** Examples that won't be accepted
+
+The following can not be made to be accepted with ~scalafmt~, but are given as valid examples.
+
+*** control structures
+
+#+BEGIN_SRC scala
+  // format: off
+  // no config to allow if before indenting
+  val news = if (foo)
+    goodNews()
+  else
+    badNews()
+  // format: on
+#+END_SRC
+
+*** declarations
+#+BEGIN_SRC scala
+  // format: off
+  // either add a body or use {} on same line.
+  class Person(name: String, age: Int) {
+  }
+  // format: on
+#+END_SRC
+
+#+BEGIN_SRC scala
+  class Person(
+      name: String,
+      age: Int,
+      birthdate: Date,
+      astrologicalSign: String,
+      shoeSize: Int,
+      favoriteColor: java.awt.Color)
+    extends Entity
+    with Logging
+    with Identifiable
+// format: off
+// either add a body or use {} on same line
+    with Serializable {
+  }
+// format: on
+#+END_SRC
+
+*** method invocation
+
+#+BEGIN_SRC scala
+  // format: off
+  // legal, but less readable
+  a+b
+  // format:on
+#+END_SRC
+
+
+*** naming conventions
+
+#+BEGIN_SRC scala
+  // format: off
+  // provide a body or put {} on one line.
+  /**
+   * Provides classes related to coolness
+    */
+  package object coolness {
+  }
+  // format: on
+#+END_SRC
+
+*** nested blocks
+
+#+BEGIN_SRC scala
+  // scalafmt: off
+  // this is said to allow operators and parentheses to align
+  // but doesn't seem very standard.
+  (  someCondition
+  || someOtherCondition
+  || thirdCondition
+  )
+  // scalafmt: on
+#+END_SRC
+
+*** scaladoc
+
+All examples here use a style that's not recognised by ~scalafmt~. Additionally, ~scalafmt~ does not recognise ~format~ comments around scaladoc.
+
+** Examples changes in the style guide
+
+The following need to be edited to compile, as ~scalafmt~ needs a valid AST.
+
+This is aside from the examples that need to be wrapped in a
+surrounding package or object to compile, which is all of them, and those that use ~...~, invalid Scala, which is most of them.
+
+*** naming conventions
+
+This example is missing a ~}~
+#+BEGIN_SRC scala
+    class Company {
+      val string: Property[String] = Property("Initial Value")
+#+END_SRC
+
+The scaladoc in this example is not consistent with the scaladoc section.
+
+*** files
+
+Here ~...~ is standing in for more than just a value -- needs to be replace with `{}`.
+
+#+BEGIN_SRC scala
+class Inbox { ... }
+
+// companion object
+object Inbox { ... }
+#+END_SRC
+
+* Issues with scalafmt
+
+~//format: off~ does not turn off scalafmt processing of scaladoc.
